@@ -1,4 +1,6 @@
-module github.com/skyrocknroll/go-mod-example
+module pruebasasd
+
+go 1.14
 
 require (
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
