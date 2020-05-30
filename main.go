@@ -1,24 +1,27 @@
 package main
 
 import (
+	"io"
 	"net/http"
-	"os"
 
-	"github.com/russross/blackfriday"
+	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	http.HandleFunc("/markdown", GenerateMarkdown)
-	http.Handle("/", http.FileServer(http.Dir("public")))
-	http.ListenAndServe(":"+port, nil)
+	port := kingpin.Flag("port", "Port Number to listen").Default("9999").Short('p').String()
+	kingpin.Parse()
+	r := mux.NewRouter()
+	r.HandleFunc("/", HomeHandler)
+	//r.HandleFunc("/products", ProductsHandler)
+	//r.HandleFunc("/articles", ArticlesHandler)
+	http.Handle("/", r)
+	logrus.Info(*port)
+	http.ListenAndServe("0.0.0.0:"+*port, r)
 }
 
-func GenerateMarkdown(rw http.ResponseWriter, r *http.Request) {
-	markdown := blackfriday.MarkdownCommon([]byte(r.FormValue("body")))
-	rw.Write(markdown)
+func HomeHandler(writer http.ResponseWriter, request *http.Request) {
+	io.WriteString(writer, "Hello World!")
+	logrus.Info(request.RemoteAddr)
 }
